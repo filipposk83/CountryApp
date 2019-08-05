@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Country App</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+        integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+
+    <style>
+        #output-wrapper {
+            height: 250px;
+        }
+    </style>
+
+    <!-- OpenLayers -->
+    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css"
+        type="text/css">
+    <style>
+        .map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container mt-5">
+        <!-- HEADER -->
+        <section class="row">
+            <div class="col">
+                <div class="jumbotron">
+                    <h1 class="display-4"><i class="fas fa-globe-europe"></i> Country App</h1>
+                    <p class="lead">Get information for countries around the world.</p>
+                    <hr class="my-4">
+                    <!-- FORM -->
+                    <form class="form-inline" id="info">
+                        <div class="form-group mx-sm-3 mb-2">
+                            <label for="country" class="sr-only">Country Name</label>
+                            <input type="text" class="form-control" id="country" placeholder="Enter country name">
+                        </div>
+                        <button type="submit" class="btn btn-primary mb-2">Get Info</button>
+                    </form>
+                    <!-- FORM -->
+                </div>
+            </div>
+        </section>
+        <!-- OUTPUT -->
+        <section class="row px-3 mb-5" id="output-wrapper">
+            <!-- BS4                    === CSS -->
+            <!-- d-flex                 === display: flex; -->
+            <!-- justify-content-center === justify-content: center; -->
+            <!-- align-items-center     === align-items: center; -->
+            <div class="col-8 p-0 bg-info d-flex justify-content-center align-items-center">
+                <div id="map" class="map"></div>
+            </div>
+            <div class="col border bg-light">
+                <div id="output"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
+
+    <script>
+        function init($) {
+
+            function onSuccess(data) {
+                // 5) Get data and add to HTML
+                let countryData = data[0];
+                console.log(countryData);
+                let content = `
+                    <p> Name: ${countryData.name}</p>
+                    <p> Name: ${countryData.capital}</p>
+                    <p> Name: ${countryData.population}</p>
+                    <img width="200px" src="${countryData.flag}" />
+                `;
+
+                // Add data to content
+                $("#output").html(content);
+                $("#map").html("");
+                showMapFromXY(countryData.latlng[0], countryData.latlng[1]);
+
+
+            }
+
+            function onError(error) {
+                console.log(error);
+            }
+
+            function handleInput(input) {
+                // 3.2) Convert to lowercase
+                input = input.toLowerCase();
+                // 3.3) Remove extra spaces
+                input = input.trim();
+                return input;
+            }
+
+            function handleSubmit(event) {
+                event.preventDefault();
+                // 3) Get input value
+                let countryName = $("#country").val();
+                // 3.1) Check length of input
+                if (countryName.length < 2) {
+                    console.log("Country name invalid");
+                    return false;
+                }
+
+                countryName = handleInput(countryName);
+                console.log(countryName);
+
+                let options = {
+                    url: `https://restcountries.eu/rest/v2/name/${countryName}`,
+                    success: onSuccess,
+                    error: onError
+                }
+
+                // 4) Make ajax call with input value
+                $.ajax(options);
+                
+            }
+
+            // 2) Add submit handler
+            $("#info").on("submit", handleSubmit);
+
+            // function for showing the Map
+            function showMapFromXY(x, y) {
+                let map = new ol.Map({
+                    target: 'map',
+                    layers: [
+                        new ol.layer.Tile({
+                            source: new ol.source.OSM()
+                        })
+                    ],
+                    view: new ol.View({
+                        center: ol.proj.fromLonLat([y, x]),
+                        zoom: 4
+                    })
+                });
+            }
+
+        }
+        // 1) On document ready initialize
+        jQuery(document).ready(init);
+
+        // CHALLENGES:
+        // 1) Add a third parameter to the map display function for zoom
+        // 2) Add an input with preselected numbers for the zoom
+        // 3) Display the map according to the selected zoom input value
+
+    </script>
+</body>
+
+</html>

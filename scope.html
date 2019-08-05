@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Scope & Hoisting</title>
+</head>
+<body>
+    <h1>Scoping & Hoisting in Javascript</h1>
+    <script>
+
+        var message; // === udefined
+
+        // Hoisting: Functions are automatically moved ath the top of the program
+        // before execution
+        display("Hello!");
+
+        function display (msg){
+            console.log(msg);
+        }
+
+        console.log(message);
+        // var message = "What?";
+        message = "What?";
+        console.log(message);
+
+        var config = "critical";
+        // 10.000 lines of code in between...
+        var config = "severe";
+        console.log(config);
+
+        // let prevents us from declalring duplicate variable names:
+        let password = 1234;
+
+        try {
+            let password = 4567;
+        } catch (error){
+            console.log(error);
+        }
+
+        console.log(password);
+
+        // variables declared with var are function scoped, and thus available outside of all block statements
+        if (true){
+            var something = "Something";
+        }
+        console.log(something);
+
+        // variables declared with var are private only inside function:
+        function main(){
+            var priv = "Private";
+        }
+        console.log("priv:", priv);
+
+        // let & const create block-scoped and function-scoped private variables:
+        if(true){
+            let priv2 = 2;
+            const priv3 = 3;
+        }
+        console.log(priv2, priv3);
+
+        // const enables us to declare variables, assign a value to them
+        // and prevent us from changing the value
+        const server = "Linux";
+        server = "Windows";
+
+    </script>
+</body>
+</html>
